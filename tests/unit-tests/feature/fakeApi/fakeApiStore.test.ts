@@ -25,7 +25,7 @@ describe('FakeApiStore tests', () => {
       makeTestItem(5, [makeTestItem(6, [])]),
     ];
 
-    const store = new FakeApiStore({ data: makeData(), delay });
+    const store = new FakeApiStore({ data: makeData(), delay, generateId: () => '' });
 
     expect(await store.getDataList()).toEqual(makeData());
   });
@@ -34,7 +34,7 @@ describe('FakeApiStore tests', () => {
     const makeData = (): DataItem[] => [makeTestItem(1, [makeTestItem(2, [makeTestItem(3, [makeTestItem(4, [])])])])];
     const makeExpectData = (): DataItem => makeTestItem(3, [makeTestItem(4, [])]);
 
-    const store = new FakeApiStore({ data: makeData(), delay });
+    const store = new FakeApiStore({ data: makeData(), delay, generateId: () => '' });
 
     expect(await store.getItem('3')).toEqual(makeExpectData());
   });
@@ -42,7 +42,7 @@ describe('FakeApiStore tests', () => {
   it('getDataItem должен вернуть null, если нет элемента с запрошенным ID', async () => {
     const makeData = (): DataItem[] => [makeTestItem(1, [makeTestItem(2, [makeTestItem(3, [makeTestItem(4, [])])])])];
 
-    const store = new FakeApiStore({ data: makeData(), delay });
+    const store = new FakeApiStore({ data: makeData(), delay, generateId: () => '' });
 
     expect(await store.getItem('5')).toBeNull();
   });
@@ -56,7 +56,7 @@ describe('FakeApiStore tests', () => {
 
     const data = makeData();
 
-    const store = new FakeApiStore({ data, delay });
+    const store = new FakeApiStore({ data, delay, generateId: () => '' });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, children, ...body } = makeTestItem(5, []);
 
@@ -71,7 +71,7 @@ describe('FakeApiStore tests', () => {
 
     const data = makeData();
 
-    const store = new FakeApiStore({ data, delay });
+    const store = new FakeApiStore({ data, delay, generateId: () => '' });
 
     expect(await store.patchItem('555', { count: 55, name: 'data 555', sum: 5555 })).toBeNull();
     expect(data).toEqual(makeData());
@@ -83,7 +83,7 @@ describe('FakeApiStore tests', () => {
     const DELETE_ITEM_ID = '3';
 
     const data = makeData();
-    const store = new FakeApiStore({ data, delay });
+    const store = new FakeApiStore({ data, delay, generateId: () => '' });
 
     expect(await store.deleteItem(DELETE_ITEM_ID)).toBe(true);
     expect(data).toEqual(makeExpectData());
@@ -95,9 +95,56 @@ describe('FakeApiStore tests', () => {
     const DELETE_ITEM_ID = '555';
 
     const data = makeData();
-    const store = new FakeApiStore({ data, delay });
+    const store = new FakeApiStore({ data, delay, generateId: () => '' });
 
     expect(await store.deleteItem(DELETE_ITEM_ID)).toBe(false);
+    expect(data).toEqual(makeData());
+  });
+
+  it('для parentId !== null, addItem должен вернуть id нового элемента, а а хранилище данных должно быть модифицировано', async () => {
+    const NEW_ELEMENT_ID = 5;
+    const PARENT_ID = 2;
+    const makeData = (): DataItem[] => [makeTestItem(1, [makeTestItem(2, [makeTestItem(3, [makeTestItem(4, [])])])])];
+    const makeExpectData = (): DataItem[] => [
+      makeTestItem(1, [makeTestItem(2, [makeTestItem(3, [makeTestItem(4, [])]), makeTestItem(5, [])])]),
+    ];
+    const data = makeData();
+    const store = new FakeApiStore({ data, delay, generateId: () => NEW_ELEMENT_ID.toString() });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, children, ...body } = makeTestItem(NEW_ELEMENT_ID, []);
+    const result = await store.addItem(PARENT_ID.toString(), body);
+    expect(result).toEqual({ id: NEW_ELEMENT_ID.toString() });
+    expect(data).toEqual(makeExpectData());
+  });
+
+  it('для parentId === null, addItem должен вернуть id нового элемента, а хранилище данных должно быть модифицировано', async () => {
+    const NEW_ELEMENT_ID = 5;
+    const PARENT_ID = null;
+    const makeData = (): DataItem[] => [makeTestItem(1, [makeTestItem(2, [makeTestItem(3, [makeTestItem(4, [])])])])];
+    const makeExpectData = (): DataItem[] => [
+      makeTestItem(1, [makeTestItem(2, [makeTestItem(3, [makeTestItem(4, [])])])]),
+      makeTestItem(5, []),
+    ];
+    const data = makeData();
+    const store = new FakeApiStore({ data, delay, generateId: () => NEW_ELEMENT_ID.toString() });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, children, ...body } = makeTestItem(NEW_ELEMENT_ID, []);
+    const result = await store.addItem(PARENT_ID, body);
+    expect(result).toEqual({ id: NEW_ELEMENT_ID.toString() });
+    expect(data).toEqual(makeExpectData());
+  });
+
+  it('Если parentId не найден, addItem должен вернуть null, а а хранилище данных не должно быть модифицировано', async () => {
+    const NEW_ELEMENT_ID = 5;
+    const PARENT_ID = 555;
+    const makeData = (): DataItem[] => [makeTestItem(1, [makeTestItem(2, [makeTestItem(3, [makeTestItem(4, [])])])])];
+
+    const data = makeData();
+    const store = new FakeApiStore({ data, delay, generateId: () => NEW_ELEMENT_ID.toString() });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, children, ...body } = makeTestItem(NEW_ELEMENT_ID, []);
+    const result = await store.addItem(PARENT_ID.toString(), body);
+    expect(result).toBeNull();
     expect(data).toEqual(makeData());
   });
 });

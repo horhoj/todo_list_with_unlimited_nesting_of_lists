@@ -13,4 +13,12 @@ export type RowTreeNodeBody = Omit<DataItem, 'children'>;
 export interface RowTreeNodeView {
   body: RowTreeNodeBody;
   listPosition: ListPosition[];
+  isNew: boolean;
+  parentId: string | null;
 }
+
+export interface CreateItemId {
+  value: string | null;
+}
+
+export type RowTreeFormValues = Omit<RowTreeNodeBody, 'id'>;

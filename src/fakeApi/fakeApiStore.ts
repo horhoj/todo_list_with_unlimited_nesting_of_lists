@@ -1,17 +1,20 @@
+import cloneDeep from 'lodash.clonedeep';
 import { DataBodyItem, DataItem, FakeApiStoreContract } from './types';
 
 export class FakeApiStore implements FakeApiStoreContract {
-  private data: DataItem[] = [];
+  private data: DataItem[];
   private delay: () => Promise<void>;
+  private generateId: () => string;
 
-  public constructor(payload: { data: DataItem[]; delay: () => Promise<void> }) {
+  public constructor(payload: { data: DataItem[]; delay: () => Promise<void>; generateId: () => string }) {
     this.data = payload.data;
     this.delay = payload.delay;
+    this.generateId = payload.generateId;
   }
 
   public async getDataList() {
     await this.delay();
-    return this.data;
+    return cloneDeep(this.data);
   }
 
   public async getItem(id: string): Promise<DataItem | null> {
@@ -22,7 +25,35 @@ export class FakeApiStore implements FakeApiStoreContract {
       const current = stack.shift();
       if (current !== undefined) {
         if (current.id === id) {
-          return current;
+          return cloneDeep(current);
+        }
+        stack.unshift(...current.children);
+      }
+    }
+
+    return null;
+  }
+
+  public async addItem(parentId: string | null, body: DataBodyItem): Promise<{ id: string } | null> {
+    await this.delay();
+
+    if (parentId === null) {
+      const id = this.generateId();
+      this.data.push({ id, ...body, children: [] });
+      return { id };
+    }
+
+    const stack = [...this.data];
+
+    while (stack.length > 0) {
+      const current = stack.shift();
+      if (current !== undefined) {
+        if (current.id === parentId) {
+          const id = this.generateId();
+
+          current.children.push({ id, ...body, children: [] });
+
+          return { id };
         }
         stack.unshift(...current.children);
       }
@@ -42,7 +73,7 @@ export class FakeApiStore implements FakeApiStoreContract {
           current.name = body.name;
           current.count = body.count;
           current.sum = body.sum;
-          return current;
+          return cloneDeep(current);
         }
         stack.unshift(...current.children);
       }

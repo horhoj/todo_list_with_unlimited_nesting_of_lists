@@ -1,13 +1,27 @@
-import { ListPosition, RowTreeNodeView } from './types';
+import { CreateItemId, ListPosition, RowTreeNodeView } from './types';
+import { getUUID } from '~/utils/getUUID';
 import { DataItem } from '~/fakeApi/types';
 
-export const makeRowTreeNodeViewList = (treeX: DataItem[]) => {
+export const makeRowTreeNodeViewList = (treeX: DataItem[], createItemId: CreateItemId | null) => {
+  let newDataItemId: string | null;
+  const makeNew = (id: string): DataItem => ({
+    id,
+    name: '',
+    count: 0,
+    sum: 0,
+    children: [],
+  });
+
   const result: RowTreeNodeView[] = [];
   let deep = 0;
 
   const tree = treeX.slice();
+  if (createItemId?.value === null) {
+    newDataItemId = getUUID();
+    tree.push(makeNew(newDataItemId));
+  }
 
-  const runner = (tree: DataItem[], prevListPosition: ListPosition[]) => {
+  const runner = (tree: DataItem[], prevListPosition: ListPosition[], parentId: string | null) => {
     tree.forEach(({ children, ...body }, index, arr) => {
       let listPosition: ListPosition = ListPosition.START;
       if (index < arr.length - 1 && index > 0) {
@@ -29,14 +43,18 @@ export const makeRowTreeNodeViewList = (treeX: DataItem[]) => {
       }
 
       const currentListPosition = [...prevListPositionClone, listPosition];
-      result.push({ body, listPosition: currentListPosition });
+      result.push({ body, listPosition: currentListPosition, isNew: newDataItemId === body.id, parentId });
       const actualChild = children.slice();
+      if (createItemId?.value === body.id) {
+        newDataItemId = getUUID();
+        actualChild.push(makeNew(newDataItemId));
+      }
 
-      runner(actualChild, currentListPosition);
+      runner(actualChild, currentListPosition, body.id);
     });
   };
 
-  runner(tree, []);
+  runner(tree, [], null);
 
   return { result, deep };
 };

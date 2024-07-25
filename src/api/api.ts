@@ -1,6 +1,7 @@
 import { FakeApiStore } from '~/fakeApi/fakeApiStore';
 import { DataItem } from '~/fakeApi/types';
 import { delay as delayFn } from '~/utils/delay';
+import { getUUID } from '~/utils/getUUID';
 
 const API_DELAY_EMULATION_TIME_IN_MS = 300;
 
@@ -24,4 +25,8 @@ const makeData = () => [
   makeTestItem(5, [makeTestItem(6, [])]),
 ];
 
-export const API = new FakeApiStore({ data: makeData(), delay: () => delayFn(API_DELAY_EMULATION_TIME_IN_MS) });
+export const API = new FakeApiStore({
+  data: makeData(),
+  delay: () => delayFn(API_DELAY_EMULATION_TIME_IN_MS),
+  generateId: getUUID,
+});

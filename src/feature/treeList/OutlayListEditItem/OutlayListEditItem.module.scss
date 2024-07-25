@@ -1,0 +1,26 @@
+.OutlayListEditItem {}
+
+.form {
+  display: none;
+}
+
+.field {
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+  position: relative;
+
+}
+
+.error {
+  position: absolute;
+  color: red;
+  display: block;
+  font-size: 12px;
+  background-color: #000;
+  font-weight: 700;
+  right: 10px;
+  padding: 3px;
+  border-radius: 4px;
+  top: -14px;
+}
