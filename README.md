@@ -1,5 +1,7 @@
 # Туду лист с бесконечной вложенностью списков туду. С тестами и полноценной эмуляцией слоя АПИ
 
+ДЕМО: https://todo-list-with-unlimited-nesting-of-lists.vercel.app/
+
 # Используется: 
 
 vite, react, typescript, redux-tookit, docker(docker-compose), nginx (для раздачи статики билда), eslint + prettier
