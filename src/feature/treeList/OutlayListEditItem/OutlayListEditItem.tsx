@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { RowTreeFormValues, RowTreeNodeBody } from '../types';
@@ -12,6 +12,7 @@ interface OutlayListEditItemProps {
   itemBody: RowTreeNodeBody;
   onSubmit: (id: string, values: RowTreeFormValues) => void;
   disabled: boolean;
+  onEditCancel: () => void;
 }
 
 const VALIDATION_IS_EMPTY_MSG = 'не заполнено';
@@ -39,7 +40,7 @@ const validationSchema: yup.ObjectSchema<RowTreeFormValues> = yup.object({
     .required(VALIDATION_IS_EMPTY_MSG),
 });
 
-export function OutlayListEditItem({ itemBody, onSubmit, disabled }: OutlayListEditItemProps) {
+export function OutlayListEditItem({ itemBody, onSubmit, disabled, onEditCancel }: OutlayListEditItemProps) {
   const FORM_ID = useMemo(() => `form_${getUUID()}`, []);
 
   const { id, ...initialValues } = itemBody;
@@ -56,6 +57,21 @@ export function OutlayListEditItem({ itemBody, onSubmit, disabled }: OutlayListE
   const nameFieldData = getFormikFieldData(formik, 'name');
   const countFieldData = getFormikFieldData(formik, 'count');
   const sumFieldData = getFormikFieldData(formik, 'sum');
+
+  useEffect(() => {
+    const cb = (e: KeyboardEvent) => {
+      // console.log(e);
+      if (e.code === 'Escape') {
+        onEditCancel();
+      }
+    };
+
+    window.addEventListener('keyup', cb);
+
+    return () => {
+      window.removeEventListener('keyup', cb);
+    };
+  }, [onEditCancel]);
 
   return (
     <>

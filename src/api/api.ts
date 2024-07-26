@@ -8,7 +8,7 @@ const STORE_DATA_LS_KEY = 'STORE_DATA_LS_KEY';
 
 const makeTestItem = (id: number, children: DataItem[]): DataItem => ({
   id: `${id.toString()}___${getUUID()}`,
-  name: `data item ${id}`,
+  name: `Элемент ${id}`,
   sum: id * 100,
   count: id * 10,
   children,

@@ -30,6 +30,11 @@ export function OutlayList({
   onDelete,
   disabled,
 }: OutlayListProps) {
+  const handleCancel = () => {
+    onEditCancel();
+    onCreateCancel();
+  };
+
   return (
     <div className={styles.OutlayListWrapper}>
       <table className={styles.OutlayList}>
@@ -95,6 +100,7 @@ export function OutlayList({
                     itemBody={row.body}
                     onSubmit={(_, values) => onCreateSubmit(row.parentId, values)}
                     disabled={disabled}
+                    onEditCancel={handleCancel}
                   />
                 )}
                 {row.isEdit && (
@@ -102,6 +108,7 @@ export function OutlayList({
                     itemBody={row.body}
                     onSubmit={(_, values) => onEditSubmit(row.body.id, values)}
                     disabled={disabled}
+                    onEditCancel={handleCancel}
                   />
                 )}
               </tr>
