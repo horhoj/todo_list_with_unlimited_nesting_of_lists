@@ -2,7 +2,11 @@ import { CreateItemId, ListPosition, RowTreeNodeView } from './types';
 import { getUUID } from '~/utils/getUUID';
 import { DataItem } from '~/fakeApi/types';
 
-export const makeRowTreeNodeViewList = (treeX: DataItem[], createItemId: CreateItemId | null) => {
+export const makeRowTreeNodeViewList = (
+  originalTree: DataItem[],
+  createItemId: CreateItemId | null,
+  editItemId: string | null,
+) => {
   let newDataItemId: string | null;
   const makeNew = (id: string): DataItem => ({
     id,
@@ -15,7 +19,7 @@ export const makeRowTreeNodeViewList = (treeX: DataItem[], createItemId: CreateI
   const result: RowTreeNodeView[] = [];
   let deep = 0;
 
-  const tree = treeX.slice();
+  const tree = originalTree.slice();
   if (createItemId?.value === null) {
     newDataItemId = getUUID();
     tree.push(makeNew(newDataItemId));
@@ -43,7 +47,13 @@ export const makeRowTreeNodeViewList = (treeX: DataItem[], createItemId: CreateI
       }
 
       const currentListPosition = [...prevListPositionClone, listPosition];
-      result.push({ body, listPosition: currentListPosition, isNew: newDataItemId === body.id, parentId });
+      result.push({
+        body,
+        listPosition: currentListPosition,
+        isNew: newDataItemId === body.id,
+        parentId,
+        isEdit: editItemId === body.id,
+      });
       const actualChild = children.slice();
       if (createItemId?.value === body.id) {
         newDataItemId = getUUID();

@@ -15,6 +15,7 @@ export interface RowTreeNodeView {
   listPosition: ListPosition[];
   isNew: boolean;
   parentId: string | null;
+  isEdit: boolean;
 }
 
 export interface CreateItemId {

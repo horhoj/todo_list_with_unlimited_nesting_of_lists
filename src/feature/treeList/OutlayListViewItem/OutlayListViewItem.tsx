@@ -1,5 +1,5 @@
 import { RowTreeNodeBody } from '../types';
-import styles from './OutlayListViewItem.module.scss';
+// import styles from './OutlayListViewItem.module.scss';
 
 interface OutlayListViewItemProps {
   itemBody: RowTreeNodeBody;

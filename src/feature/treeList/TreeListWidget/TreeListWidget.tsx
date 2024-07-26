@@ -25,8 +25,19 @@ export function TreeListWidget() {
   };
 
   const handleCreateSubmit = (parentId: string | null, body: RowTreeFormValues) => {
-    // console.log(parentId, values);
     dispatch(treeListSlice.thunks.addDataItemRequestThunk({ parentId, body }));
+  };
+
+  const handleEdit = (id: string) => {
+    dispatch(treeListSlice.actions.setEditItemId(id));
+  };
+
+  const handleEditCancel = () => {
+    dispatch(treeListSlice.actions.setEditItemId(null));
+  };
+
+  const handleEditSubmit = (id: string, body: RowTreeFormValues) => {
+    dispatch(treeListSlice.thunks.patchDataItemRequestThunk({ id, body }));
   };
 
   return (
@@ -38,6 +49,9 @@ export function TreeListWidget() {
           onCreate={handleCreate}
           onCreateCancel={handleCreateCancel}
           onCreateSubmit={handleCreateSubmit}
+          onEdit={handleEdit}
+          onEditCancel={handleEditCancel}
+          onEditSubmit={handleEditSubmit}
         />
       )}
     </div>

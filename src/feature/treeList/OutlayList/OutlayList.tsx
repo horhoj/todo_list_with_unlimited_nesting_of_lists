@@ -12,8 +12,20 @@ interface OutlayListProps {
   onCreate: (parentId: string | null) => void;
   onCreateCancel: () => void;
   onCreateSubmit: (parentId: string | null, body: RowTreeFormValues) => void;
+  onEdit: (id: string) => void;
+  onEditCancel: () => void;
+  onEditSubmit: (id: string, body: RowTreeFormValues) => void;
 }
-export function OutlayList({ rowTreeNodeViewList, deep, onCreate, onCreateCancel, onCreateSubmit }: OutlayListProps) {
+export function OutlayList({
+  rowTreeNodeViewList,
+  deep,
+  onCreate,
+  onCreateCancel,
+  onCreateSubmit,
+  onEdit,
+  onEditCancel,
+  onEditSubmit,
+}: OutlayListProps) {
   return (
     <div className={styles.OutlayListWrapper}>
       <table className={styles.OutlayList}>
@@ -35,7 +47,13 @@ export function OutlayList({ rowTreeNodeViewList, deep, onCreate, onCreateCancel
         <tbody>
           {rowTreeNodeViewList.map((row) => {
             return (
-              <tr key={row.body.id} className={classNames(styles.tr)} title={'Двойной щелчёк для изменения'}>
+              <tr
+                key={row.body.id}
+                className={classNames(styles.tr)}
+                title={'Двойной щелчёк для изменения'}
+                onDoubleClick={() => onEdit(row.body.id)}
+                role="button"
+              >
                 <td className={styles.levelTd}>
                   <ListConnection listPosition={row.listPosition} deep={deep}>
                     <div className={styles.iconsWrapper}>
@@ -43,14 +61,19 @@ export function OutlayList({ rowTreeNodeViewList, deep, onCreate, onCreateCancel
                         <ListItemIcon />
                       </button>
 
-                      {!row.isNew && (
+                      {!row.isNew && !row.isEdit && (
                         <button title={'Удалить элемент'}>
                           <TrashItemIcon />
                         </button>
                       )}
 
                       {row.isNew && (
-                        <button title={'отменить редактирование элемента'} onClick={onCreateCancel}>
+                        <button title={'отменить добавление элемента'} onClick={onCreateCancel}>
+                          <CancelIcon />
+                        </button>
+                      )}
+                      {row.isEdit && (
+                        <button title={'отменить редактирование элемента'} onClick={onEditCancel}>
                           <CancelIcon />
                         </button>
                       )}
@@ -58,12 +81,15 @@ export function OutlayList({ rowTreeNodeViewList, deep, onCreate, onCreateCancel
                   </ListConnection>
                 </td>
 
-                {!row.isNew && <OutlayListViewItem itemBody={row.body} />}
+                {!row.isNew && !row.isEdit && <OutlayListViewItem itemBody={row.body} />}
                 {row.isNew && (
                   <OutlayListEditItem
                     itemBody={row.body}
                     onSubmit={(_, values) => onCreateSubmit(row.parentId, values)}
                   />
+                )}
+                {row.isEdit && (
+                  <OutlayListEditItem itemBody={row.body} onSubmit={(_, values) => onEditSubmit(row.body.id, values)} />
                 )}
               </tr>
             );

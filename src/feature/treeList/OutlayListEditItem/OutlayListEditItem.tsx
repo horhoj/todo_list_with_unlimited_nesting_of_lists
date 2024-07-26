@@ -67,7 +67,7 @@ export function OutlayListEditItem({ itemBody, onSubmit }: OutlayListEditItemPro
       </Portal>
       <td>
         <span className={styles.field}>
-          <Input form={FORM_ID} {...nameFieldData.fieldProps} />
+          <Input form={FORM_ID} {...nameFieldData.fieldProps} autoFocus={true} />
           {nameFieldData.isError && <span className={styles.error}>{nameFieldData.errorText}</span>}
         </span>
       </td>

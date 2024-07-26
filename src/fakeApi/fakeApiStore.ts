@@ -6,10 +6,22 @@ export class FakeApiStore implements FakeApiStoreContract {
   private delay: () => Promise<void>;
   private generateId: () => string;
 
-  public constructor(payload: { data: DataItem[]; delay: () => Promise<void>; generateId: () => string }) {
+  private saveStoreDataToLs: (data: DataItem[]) => void;
+
+  public constructor(payload: {
+    data: DataItem[];
+    delay: () => Promise<void>;
+    generateId: () => string;
+    saveStoreDataToLs: (data: DataItem[]) => void;
+  }) {
     this.data = payload.data;
     this.delay = payload.delay;
     this.generateId = payload.generateId;
+    this.saveStoreDataToLs = payload.saveStoreDataToLs;
+  }
+
+  private saveData() {
+    this.saveStoreDataToLs(this.data);
   }
 
   public async getDataList() {
@@ -40,6 +52,7 @@ export class FakeApiStore implements FakeApiStoreContract {
     if (parentId === null) {
       const id = this.generateId();
       this.data.push({ id, ...body, children: [] });
+      this.saveData();
       return { id };
     }
 
@@ -50,9 +63,8 @@ export class FakeApiStore implements FakeApiStoreContract {
       if (current !== undefined) {
         if (current.id === parentId) {
           const id = this.generateId();
-
           current.children.push({ id, ...body, children: [] });
-
+          this.saveData();
           return { id };
         }
         stack.unshift(...current.children);
@@ -73,6 +85,7 @@ export class FakeApiStore implements FakeApiStoreContract {
           current.name = body.name;
           current.count = body.count;
           current.sum = body.sum;
+          this.saveData();
           return cloneDeep(current);
         }
         stack.unshift(...current.children);
@@ -97,6 +110,7 @@ export class FakeApiStore implements FakeApiStoreContract {
       if (current !== undefined) {
         if (current.dataItem.id === id) {
           current.parent.splice(current.indexInParent, 1);
+          this.saveData();
           return true;
         }
         stack.unshift(
