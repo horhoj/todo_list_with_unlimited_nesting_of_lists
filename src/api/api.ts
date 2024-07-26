@@ -7,7 +7,7 @@ const API_DELAY_EMULATION_TIME_IN_MS = 300;
 const STORE_DATA_LS_KEY = 'STORE_DATA_LS_KEY';
 
 const makeTestItem = (id: number, children: DataItem[]): DataItem => ({
-  id: id.toString(),
+  id: `${id.toString()}___${getUUID()}`,
   name: `data item ${id}`,
   sum: id * 100,
   count: id * 10,

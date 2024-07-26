@@ -4,10 +4,12 @@ import { OutlayList } from '../OutlayList';
 import { RowTreeFormValues } from '../types';
 import styles from './TreeListWidget.module.scss';
 import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { Spinner } from '~/ui/Spinner';
 
 export function TreeListWidget() {
   const dispatch = useAppDispatch();
   const dataView = useAppSelector(getDataView);
+  const isLoading = useAppSelector(treeListSlice.selectors.isLoading);
 
   useEffect(() => {
     dispatch(treeListSlice.thunks.fetchDataRequestThunk());
@@ -40,20 +42,35 @@ export function TreeListWidget() {
     dispatch(treeListSlice.thunks.patchDataItemRequestThunk({ id, body }));
   };
 
+  const handleDelete = (id: string) => {
+    dispatch(treeListSlice.actions.setEditItemId(null));
+    dispatch(treeListSlice.actions.setCreateItemId(null));
+    setTimeout(() => {
+      if (confirm('Удалить элемент вместе с дочерними?')) {
+        dispatch(treeListSlice.thunks.deleteDataItemRequestThunk({ id }));
+      }
+    }, 100);
+  };
+
   return (
-    <div className={styles.TreeListWidget}>
-      {dataView && (
-        <OutlayList
-          deep={1}
-          rowTreeNodeViewList={dataView.result}
-          onCreate={handleCreate}
-          onCreateCancel={handleCreateCancel}
-          onCreateSubmit={handleCreateSubmit}
-          onEdit={handleEdit}
-          onEditCancel={handleEditCancel}
-          onEditSubmit={handleEditSubmit}
-        />
-      )}
-    </div>
+    <>
+      <Spinner isShow={isLoading} />
+      <div className={styles.TreeListWidget}>
+        {dataView && (
+          <OutlayList
+            onDelete={handleDelete}
+            disabled={isLoading}
+            deep={1}
+            rowTreeNodeViewList={dataView.result}
+            onCreate={handleCreate}
+            onCreateCancel={handleCreateCancel}
+            onCreateSubmit={handleCreateSubmit}
+            onEdit={handleEdit}
+            onEditCancel={handleEditCancel}
+            onEditSubmit={handleEditSubmit}
+          />
+        )}
+      </div>
+    </>
   );
 }

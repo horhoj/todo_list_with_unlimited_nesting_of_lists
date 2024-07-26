@@ -11,6 +11,7 @@ import { getFormikFieldData } from '~/utils/getFormikFieldData';
 interface OutlayListEditItemProps {
   itemBody: RowTreeNodeBody;
   onSubmit: (id: string, values: RowTreeFormValues) => void;
+  disabled: boolean;
 }
 
 const VALIDATION_IS_EMPTY_MSG = 'не заполнено';
@@ -38,7 +39,7 @@ const validationSchema: yup.ObjectSchema<RowTreeFormValues> = yup.object({
     .required(VALIDATION_IS_EMPTY_MSG),
 });
 
-export function OutlayListEditItem({ itemBody, onSubmit }: OutlayListEditItemProps) {
+export function OutlayListEditItem({ itemBody, onSubmit, disabled }: OutlayListEditItemProps) {
   const FORM_ID = useMemo(() => `form_${getUUID()}`, []);
 
   const { id, ...initialValues } = itemBody;
@@ -60,7 +61,7 @@ export function OutlayListEditItem({ itemBody, onSubmit }: OutlayListEditItemPro
     <>
       <Portal>
         <form noValidate autoComplete={'off'} id={FORM_ID} onSubmit={formik.handleSubmit} className={styles.form}>
-          <button form={FORM_ID} type={'submit'}>
+          <button form={FORM_ID} type={'submit'} disabled={disabled}>
             submit
           </button>
         </form>
