@@ -55,6 +55,11 @@ export function TreeListWidget() {
   return (
     <>
       <Spinner isShow={isLoading} />
+      <div className={styles.helper}>
+        *** Для редактирования элемента дважды кликнете по нужной строке. По нажатию Escape можно выйти из режима
+        редактирования или создания нового элемента. Для создания элемента или его удаления (вместе с дочерними),
+        нажмите иконки в соответствущей строке
+      </div>
       <div className={styles.TreeListWidget}>
         {dataView && (
           <OutlayList
