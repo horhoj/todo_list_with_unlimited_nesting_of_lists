@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { RowTreeFormValues, RowTreeNodeBody } from '../types';
@@ -45,6 +45,8 @@ export function OutlayListEditItem({ itemBody, onSubmit, disabled, onEditCancel 
 
   const { id, ...initialValues } = itemBody;
 
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
   const formik = useFormik<RowTreeFormValues>({
     initialValues,
     enableReinitialize: true,
@@ -73,6 +75,11 @@ export function OutlayListEditItem({ itemBody, onSubmit, disabled, onEditCancel 
     };
   }, [onEditCancel]);
 
+  useEffect(() => {
+    nameInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    nameInputRef.current?.focus({ preventScroll: true });
+  }, []);
+
   return (
     <>
       <Portal>
@@ -84,7 +91,7 @@ export function OutlayListEditItem({ itemBody, onSubmit, disabled, onEditCancel 
       </Portal>
       <td>
         <span className={styles.field}>
-          <Input form={FORM_ID} {...nameFieldData.fieldProps} autoFocus={true} />
+          <Input form={FORM_ID} {...nameFieldData.fieldProps} ref={nameInputRef} />
           {nameFieldData.isError && <span className={styles.error}>{nameFieldData.errorText}</span>}
         </span>
       </td>
